@@ -30,8 +30,12 @@ def read_data(path="compressed"):
                 continue
 
             with open(os.path.join(path, str(n))) as coord_file:
-                coord = json.loads(coord_file.read())
-                lat, lng = coord["lat"], coord["lng"]
+                try:
+                    coord = json.loads(coord_file.read())
+                    lat, lng = coord["lat"], coord["lng"]
+                except json.decoder.JSONDecodeError as e:
+                    print("Malformed JSON in file {}: {}".format(n, e))
+                    continue
 
             images.append(arr)
             coords.append([lat, lng])
@@ -59,7 +63,7 @@ if __name__ == "__main__":
         idx = random.randrange(0, len(images))
         im = images[idx]
         co = coords[idx]
-        lat, lng = decode_lat_long(*co)
+        lat, lng = decode_lat_long(co)
         loc = locator.reverse((lat, lng))
         print(co, loc)
         print(im.shape)
