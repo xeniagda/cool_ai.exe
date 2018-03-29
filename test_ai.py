@@ -11,6 +11,9 @@ import read_data
 import torch
 
 USE_TEST = False
+TEST_BEST = False
+
+path_to_use = BEST_PATH if TEST_BEST else SAVE_PATH
 
 data, coords = read_data.read_data()
 amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
@@ -24,9 +27,9 @@ ai = cool_ai_exe()
 
 EPOCH = 0
 
-if os.path.isfile(BEST_PATH):
-    print("Loading old state")
-    state = torch.load(BEST_PATH)
+if os.path.isfile(path_to_use):
+    print("Loading state from", path_to_use)
+    state = torch.load(path_to_use)
     ai = state["ai"]
     opt = state["opt"]
     EPOCH = state["epoch"]
