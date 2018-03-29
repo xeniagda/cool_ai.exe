@@ -99,13 +99,24 @@ if __name__ == "__main__":
         train_loss_history.append(loss.data[0])
         test_loss_history.append(test_loss.data[0])
 
-        torch.save(
-                {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
-                , "test_loss_history": test_loss_history}, SAVE_PATH)
-
-        if loss.data[0] <= min(train_loss_history):
+        try:
             torch.save(
                     {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
-                    , "test_loss_history": test_loss_history}, BEST_PATH)
-            print("Best!")
+                    , "test_loss_history": test_loss_history}, SAVE_PATH)
 
+            if loss.data[0] <= min(train_loss_history):
+                torch.save(
+                        {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
+                        , "test_loss_history": test_loss_history}, BEST_PATH)
+                print("Best!")
+        except KeyboardInterrupt as e:
+            torch.save(
+                    {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
+                    , "test_loss_history": test_loss_history}, SAVE_PATH)
+
+            if loss.data[0] <= min(train_loss_history):
+                torch.save(
+                        {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
+                        , "test_loss_history": test_loss_history}, BEST_PATH)
+                print("Best!")
+            raise e
