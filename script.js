@@ -91,11 +91,12 @@ function getScore(a,b){
 	return score;
 }
 
+var guessMarker, ansMarker;
 
 function demonstrate(){
 	var testI = Math.floor(Math.random()*30)+400;
 	var image = new Image();
-	image.src = "compressed/" + index + ".png";
+	image.src = "compressed/" + testI + ".png";
 	image.onload = function(){
 		ctx.drawImage(image,0,0);
 		var pxl = ctx.getImageData(0, 0, sz, sz);
@@ -106,7 +107,7 @@ function demonstrate(){
 			if(i%4!=3) input.push(pxl.data[i]/sz);
 		}
 
-		$.get("compressed/"+index,function(res){
+		$.get("compressed/"+testI,function(res){
 			res = JSON.parse(res);
 			output = [(res.lat+1)/2,(res.lng+1)/2];
 			var guess = neural.test(images[testI]);
@@ -115,6 +116,29 @@ function demonstrate(){
 			console.log(guess[0]*180-90 + "," + (guess[1]*360-180));
 			console.log(output[0]*180-90 + "," + (output[1]*360-180));
 			console.log(5000*Math.exp(-dist/2000));
+			
+			var pinColor = "FE7569";
+	    	var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+	        new google.maps.Size(21, 34),
+	        new google.maps.Point(0,0),
+	        new google.maps.Point(10, 34));
+
+			var from = {lat: guess[0]*180-90, lng: guess[1]*360-180};
+			var to = {lat:output[0]*180-90, lng: output[1]*360-180};
+		    if(guessMarker)
+		    	guessMarker.setMap(null);
+		    guessMarker = new google.maps.Marker({
+		      position: from,
+		      map: map
+		    });
+		    if(ansMarker)
+		    	ansMarker.setMap(null);
+		    ansMarker = new google.maps.Marker({
+		      position: to,
+		      map: map,
+		      icon:pinImage
+		    });
+
 		});
 	}
 }
@@ -184,3 +208,12 @@ function setGraphMax(mx){
     };
     graph2d.setOptions(options);
 }
+
+var map;
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+		      zoom: 1,
+		      center: {lat:0,lng:0}
+		    });
+ }
