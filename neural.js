@@ -243,10 +243,10 @@ Neural.prototype.saveFile = function() {
 
 Neural.prototype.loadFile = function() {
 	var self = this;
-	$.get("../w.json",function(res){
+	$.get("w.json",function(res){
 		self.w = (res);
 	},"json");
-	$.get("../b.json",function(res){
+	$.get("b.json",function(res){
 		self.b = (res);
 	},"json");
 }
