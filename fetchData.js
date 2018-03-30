@@ -1,6 +1,8 @@
 var fs = require('fs');
+var system = require("system")
 
-
+var amount = 0;
+var maxAmount = system.args[1] | 0;
 var index = Math.floor(fs.list("data").length/2)-1;
 
 //console.log(JSON.stringify(fs.list("data")));
@@ -72,7 +74,11 @@ function getTest(){
 		getImage(function(){
 			console.log("Done index "+ index);
 			index++;
+            amount++;
 			setTimeout(function(){
+                if (amount >= maxAmount && maxAmount != 0) {
+                    phantom.exit();
+                }
 				getTest();
 			},10);
 		});
