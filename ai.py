@@ -1,4 +1,43 @@
 import os
+import sys
+
+import argparse
+# Parse arguments
+parser = argparse.ArgumentParser(description="Train the cool_ai.exe")
+parser.add_argument(
+        "--load-path", "-l",
+        type=str, default="ai.tar",
+        help="Where to load the cool_ai.exe from")
+parser.add_argument(
+        "--save-path", "-s",
+        type=str, default="ai.tar",
+        help="Where to save the cool_ai.exe to")
+parser.add_argument(
+        "--best-path", "-b",
+        type=str, default="ai_best.tar",
+        help="Where to save the best cool_ai.exe")
+parser.add_argument(
+        "--amount",
+        type=int,
+        help="How many images to train on. Leave blank for all")
+parser.add_argument(
+        "--split",
+        type=float, default=0.8,
+        help="The train/test split")
+parser.add_argument(
+        "--learning-rate", "-lr",
+        type=float, default=0.2,
+        help="The learning rate the cool_ai.exe should use")
+parser.add_argument(
+        "--momentum", "-m",
+        type=float, default=0.3,
+        help="Learning momentum")
+parser.add_argument(
+        "--new", "-n",
+        action="store_true",
+        help="Create a new cool_ai.exe")
+
+args = parser.parse_args()
 
 import torch
 import torch.nn as nn
@@ -18,12 +57,16 @@ pool 4 -> -1x5x2x2
 connected 2 -> -1x2
 """
 
-SAVE_PATH = "ai.tar"
-BEST_PATH = "ai_best.tar"
+SAVE_PATH = args.save_path
+LOAD_PATH = args.load_path
+BEST_PATH = args.best_path
 
-TRAIN_TEST_SPLIT = 0.8 # 80% train, 20% test
-LEARNING_RATE = 0.2
-MOMENTUM = 0.3
+TRAIN_TEST_SPLIT = args.split
+LEARNING_RATE = args.learning_rate
+MOMENTUM = args.momentum
+
+
+
 
 class cool_ai_exe(nn.Module):
     def __init__(self):
@@ -46,7 +89,7 @@ class cool_ai_exe(nn.Module):
 
 if __name__ == "__main__":
     print("Loading data...")
-    data, coords = read_data.read_data(amount=5000)
+    data, coords = read_data.read_data(amount=args.amount or -1)
     amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
     data_train, data_test = data[:amount], data[amount:]
     coords_train, coords_test = coords[:amount], coords[amount:]
@@ -64,14 +107,17 @@ if __name__ == "__main__":
     train_loss_history = []
     test_loss_history = []
 
-    if os.path.isfile(SAVE_PATH):
-        print("Loading old state")
-        state = torch.load(SAVE_PATH)
-        ai = state["ai"]
-        opt = state["opt"]
-        EPOCH = state["epoch"]
-        train_loss_history = state["train_loss_history"]
-        test_loss_history  = state["test_loss_history"]
+    if not args.new:
+        if os.path.isfile(LOAD_PATH):
+            print("Loading old state")
+            state = torch.load(LOAD_PATH)
+            ai = state["ai"]
+            opt = state["opt"]
+            EPOCH = state["epoch"]
+            train_loss_history = state["train_loss_history"]
+            test_loss_history  = state["test_loss_history"]
+        else:
+            print("Can't find {}. If you want to create a new ai, use --new".format(LOAD_PATH))
 
     while True:
         EPOCH += 1
@@ -93,7 +139,12 @@ if __name__ == "__main__":
 
         test_res = ai(Variable(torch.Tensor(data_test)))
         test_loss = crit(test_res, Variable(torch.Tensor(coords_test)))
-        print(ERASE_LAST +
+
+        if len(train_loss_history) > 0 and loss.data[0] <= min(train_loss_history):
+            print(ERASE_LAST +
+                "Generation {:4d}: Test: {:.4f}, Train: {:.4f} (best)".format(EPOCH, test_loss.data[0], loss.data[0]))
+        else:
+            print(ERASE_LAST +
                 "Generation {:4d}: Test: {:.4f}, Train: {:.4f}".format(EPOCH, test_loss.data[0], loss.data[0]))
 
         train_loss_history.append(loss.data[0])
@@ -108,7 +159,6 @@ if __name__ == "__main__":
                 torch.save(
                         {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
                         , "test_loss_history": test_loss_history}, BEST_PATH)
-                print("Best!")
         except KeyboardInterrupt as e:
             torch.save(
                     {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
@@ -118,5 +168,5 @@ if __name__ == "__main__":
                 torch.save(
                         {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
                         , "test_loss_history": test_loss_history}, BEST_PATH)
-                print("Best!")
             raise e
+
