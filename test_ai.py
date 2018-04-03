@@ -10,12 +10,14 @@ from ai import *
 import read_data
 import torch
 
-USE_TEST = False
+USE_TEST = True
 TEST_BEST = False
+
+proj = plt.imread("mercator.png")
 
 path_to_use = BEST_PATH if TEST_BEST else SAVE_PATH
 
-data, coords = read_data.read_data()
+data, coords = read_data.read_data(amount=5000)
 amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
 
 data_test   = data[amount:] if USE_TEST else data[:amount]
@@ -49,6 +51,11 @@ plt.show()
 
 locator = Nominatim()
 
+def long_lat2xy(long, lat):
+    x = (lat + 180) / 360 * proj.shape[1]
+    y = (-long + 110) / 108 / 2 * proj.shape[0]
+    return x, y
+
 for i in range(10):
     idx = random.randrange(len(data_test))
 
@@ -63,12 +70,19 @@ for i in range(10):
     dist = distance(coord_ll, guess_ll).kilometers
 
     print("Im #{}: guess: ({:.4f}, {:.4f}), real: ({:.4f}, {:.4f})".format(i, *guess_ll, *coord_ll))
-    try: print("Guess address:", locator.reverse(guess_ll))
+    try: print("Guess address: " + str(locator.reverse(guess_ll)))
     except: pass
-    try: print("Real address:", locator.reverse(coord_ll))
+    try: print("Real address: " +  str(locator.reverse(coord_ll)))
     except: pass
     print("Distance: {:.4f}km".format(dist))
     print("Score: {:d}".format(round(read_data.score(dist))))
 
+    plt.subplot(121)
     plt.imshow(im.transpose(1, 2, 0))
+
+    plt.subplot(122)
+    plt.imshow(proj)
+    plt.scatter(*long_lat2xy(*coord_ll), c="green")
+    plt.scatter(*long_lat2xy(*guess_ll), c="red")
+
     plt.show()
