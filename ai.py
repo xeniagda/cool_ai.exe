@@ -94,8 +94,8 @@ if __name__ == "__main__":
     data_train, data_test = data[:amount], data[amount:]
     coords_train, coords_test = coords[:amount], coords[amount:]
 
-    print("Train images:", data_train.shape)
-    print("Test images:", data_test.shape)
+    print("Train images:", " x ".join(map(str, data_train.shape)))
+    print(" Test images:", " x ".join(map(str, data_test.shape)))
 
     ai = cool_ai_exe()
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     while True:
         EPOCH += 1
 
-        print("Generation {:4d}".format(EPOCH))
+        print("Generation {:4d}...".format(EPOCH))
         ai.zero_grad()
 
         # print("Training...")
@@ -140,22 +140,23 @@ if __name__ == "__main__":
         test_res = ai(Variable(torch.Tensor(data_test)))
         test_loss = crit(test_res, Variable(torch.Tensor(coords_test)))
 
-        if len(train_loss_history) > 0 and loss.data[0] <= min(train_loss_history):
+        train_loss_history.append(loss.data[0])
+        test_loss_history.append(test_loss.data[0])
+
+        is_best = loss.data[0] == min(train_loss_history)
+        if is_best:
             print(ERASE_LAST +
                 "Generation {:4d}: Test: {:.4f}, Train: {:.4f} (best)".format(EPOCH, test_loss.data[0], loss.data[0]))
         else:
             print(ERASE_LAST +
                 "Generation {:4d}: Test: {:.4f}, Train: {:.4f}".format(EPOCH, test_loss.data[0], loss.data[0]))
 
-        train_loss_history.append(loss.data[0])
-        test_loss_history.append(test_loss.data[0])
-
         try:
             torch.save(
                     {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
                     , "test_loss_history": test_loss_history}, SAVE_PATH)
 
-            if loss.data[0] <= min(train_loss_history):
+            if is_best:
                 torch.save(
                         {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
                         , "test_loss_history": test_loss_history}, BEST_PATH)
@@ -164,7 +165,7 @@ if __name__ == "__main__":
                     {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
                     , "test_loss_history": test_loss_history}, SAVE_PATH)
 
-            if loss.data[0] <= min(train_loss_history):
+            if is_best:
                 torch.save(
                         {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
                         , "test_loss_history": test_loss_history}, BEST_PATH)
