@@ -3,7 +3,6 @@ import json
 import os
 
 import PIL.Image as im
-from geopy.geocoders import Nominatim
 import numpy as np
 from scipy.misc import imresize
 
@@ -82,6 +81,7 @@ def score(x):
 if __name__ == "__main__":
     import random
     import matplotlib.pyplot as plt
+    from geopy.geocoders import Nominatim
 
     locator = Nominatim()
 
