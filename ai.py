@@ -46,7 +46,7 @@ class cool_ai_exe(nn.Module):
 
 if __name__ == "__main__":
     print("Loading data...")
-    data, coords = read_data.read_data()
+    data, coords = read_data.read_data(amount=5000)
     amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
     data_train, data_test = data[:amount], data[amount:]
     coords_train, coords_test = coords[:amount], coords[amount:]

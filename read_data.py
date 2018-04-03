@@ -9,19 +9,26 @@ from scipy.misc import imresize
 
 WANTED_SIZE = 32, 32
 
-def read_data(path="compressed"):
+def read_data(path="compressed", amount=-1):
     images = []
     coords = []
 
-    for f in sorted(os.listdir(path)):
+    files = os.listdir(path)
+    if amount != -1:
+        files = files[:amount]
+
+    for f in sorted(files):
         if f.endswith(".png"):
             n = int(f[:-4])
             image = im.open(os.path.join(path, f))
             arr = (np.array(image.getdata(), dtype="float")/256).reshape(*image.size, -1).transpose(2, 0, 1)
 
             if arr.shape[1:] != WANTED_SIZE:
-                arr = imresize(arr, WANTED_SIZE)
-                continue
+                try:
+                    arr = imresize(arr, WANTED_SIZE)
+                    continue
+                except:
+                    print("{} is of wrong dimensions: {}".format(f, arr.shape))
 
             arr = arr[:3,:,:]
 
@@ -55,7 +62,7 @@ if __name__ == "__main__":
 
     locator = Nominatim()
 
-    images, coords = read_data()
+    images, coords = read_data(amount=5000)
     print(images.shape)
     print(coords.shape)
 
