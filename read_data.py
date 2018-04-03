@@ -13,12 +13,12 @@ def read_data(path="compressed", amount=-1):
     images = []
     coords = []
 
-    files = os.listdir(path)
-    if amount != -1:
-        files = files[:amount]
-
-    for f in sorted(files):
+    i = 0
+    for f in sorted(os.listdir(path)):
         if f.endswith(".png"):
+            if i == amount:
+                break
+
             n = int(f[:-4])
             image = im.open(os.path.join(path, f))
             arr = (np.array(image.getdata(), dtype="float")/256).reshape(*image.size, -1).transpose(2, 0, 1)
@@ -46,6 +46,7 @@ def read_data(path="compressed", amount=-1):
 
             images.append(arr)
             coords.append([lat, lng])
+            i += 1
 
     return np.array(images), np.array(coords)
 
@@ -62,7 +63,7 @@ if __name__ == "__main__":
 
     locator = Nominatim()
 
-    images, coords = read_data(amount=5000)
+    images, coords = read_data(amount=500)
     print(images.shape)
     print(coords.shape)
 
