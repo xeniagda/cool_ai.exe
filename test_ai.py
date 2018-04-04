@@ -56,33 +56,37 @@ def long_lat2xy(long, lat):
     y = (-long + 110) / 108 / 2 * proj.shape[0]
     return x, y
 
-for i in range(10):
-    idx = random.randrange(len(data_test))
+while True:
+    for i in range(10):
+        idx = random.randrange(len(data_test))
 
-    im = data_test[idx]
-    coord = coords_test[idx]
+        im = data_test[idx]
+        coord = coords_test[idx]
 
-    guess = ai(torch.autograd.Variable(torch.Tensor([im]))).data.numpy()[0]
+        guess = ai(torch.autograd.Variable(torch.Tensor([im]))).data.numpy()[0]
 
-    coord_ll = list(read_data.decode_lat_long(coord))
-    guess_ll = list(read_data.decode_lat_long(guess))
+        coord_ll = list(read_data.decode_lat_long(coord))
+        guess_ll = list(read_data.decode_lat_long(guess))
 
-    dist = distance(coord_ll, guess_ll).kilometers
+        dist = distance(coord_ll, guess_ll).kilometers
 
-    print("Im #{}: guess: ({:.4f}, {:.4f}), real: ({:.4f}, {:.4f})".format(i, *guess_ll, *coord_ll))
-    try: print("Guess address: " + str(locator.reverse(guess_ll)))
-    except: pass
-    try: print("Real address: " +  str(locator.reverse(coord_ll)))
-    except: pass
-    print("Distance: {:.4f}km".format(dist))
-    print("Score: {:d}".format(round(read_data.score(dist))))
+        print("Im #{}: guess: ({:.4f}, {:.4f}), real: ({:.4f}, {:.4f})".format(i, *guess_ll, *coord_ll))
+        try: print("Guess address: " + str(locator.reverse(guess_ll)))
+        except: pass
+        try: print("Real address: " +  str(locator.reverse(coord_ll)))
+        except: pass
+        print("Distance: {:.4f}km".format(dist))
+        print("Score: {:d}".format(round(read_data.score(dist))))
 
-    plt.subplot(121)
-    plt.imshow(im.transpose(1, 2, 0))
+        plt.subplot(121)
+        plt.imshow(im.transpose(1, 2, 0))
 
-    plt.subplot(122)
-    plt.imshow(proj)
-    plt.scatter(*long_lat2xy(*coord_ll), c="green")
-    plt.scatter(*long_lat2xy(*guess_ll), c="red")
+        plt.subplot(122)
+        plt.imshow(proj)
+        plt.scatter(*long_lat2xy(*coord_ll), c="green")
+        plt.scatter(*long_lat2xy(*guess_ll), c="red")
 
-    plt.show()
+        plt.show()
+
+    if input("Continue? [Y/n] ").lower() == "n":
+        break
