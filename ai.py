@@ -54,6 +54,8 @@ conv 10 3x3 -> -1x10x30x30
 pool 3 -> -1x10x10x10
 conv 3 3x3 -> -1x5x8x8
 pool 4 -> -1x5x2x2
+connected 20 -> -1x20
+connected 10 -> -1x10
 connected 2 -> -1x2
 """
 
@@ -74,15 +76,20 @@ class cool_ai_exe(nn.Module):
 
         self.conv_1 = nn.Conv2d(3, 10, (3, 3))
         self.conv_2 = nn.Conv2d(10, 5, (3, 3))
-        self.conn   = nn.Linear(20, 2)
+        self.conn_1 = nn.Linear(20, 20)
+        self.conn_2 = nn.Linear(20, 10)
+        self.conn_3 = nn.Linear(10, 2)
 
     def forward(self, x):
         x = self.conv_1(x)
         x = nn.MaxPool2d((3, 3))(x)
         x = self.conv_2(x)
         x = nn.MaxPool2d((4, 4))(x)
+
         x = x.view(x.shape[0], -1)
-        x = self.conn(x)
+        x = self.conn_1(x)
+        x = self.conn_2(x)
+        x = self.conn_3(x)
 
         return x
 
