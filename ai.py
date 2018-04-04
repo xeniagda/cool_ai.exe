@@ -153,10 +153,10 @@ if __name__ == "__main__":
         is_best = loss.data[0] == min(train_loss_history)
         if is_best:
             print(ERASE_LAST +
-                "Generation {:4d}: Test: {:.4f}, Train: {:.4f} (best)".format(EPOCH, test_loss.data[0], loss.data[0]))
+                "Generation {:4d}: Test: {:.7f}, Train: {:.7f} (best)".format(EPOCH, test_loss.data[0], loss.data[0]))
         else:
             print(ERASE_LAST +
-                "Generation {:4d}: Test: {:.4f}, Train: {:.4f}".format(EPOCH, test_loss.data[0], loss.data[0]))
+                "Generation {:4d}: Test: {:.4f},    Train: {:.4f}".format(EPOCH, test_loss.data[0], loss.data[0]))
 
         try:
             torch.save(
