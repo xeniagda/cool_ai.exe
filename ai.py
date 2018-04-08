@@ -25,10 +25,6 @@ parser.add_argument(
         type=int,
         help="How many images to train on. Leave blank for all")
 parser.add_argument(
-        "--split",
-        type=float, default=0.8,
-        help="The train/test split")
-parser.add_argument(
         "--batch-size", "-bs",
         type=int, default=5000,
         help="Divide the dataset into batches for less memory usage and (potentially) faster processing")
@@ -72,7 +68,6 @@ LOAD_PATH = args.load_path
 BEST_PATH = args.best_path
 
 BATCH_SIZE = args.batch_size
-TRAIN_TEST_SPLIT = args.split
 LEARNING_RATE = args.learning_rate
 MOMENTUM = args.momentum
 
@@ -124,11 +119,10 @@ if __name__ == "__main__":
             print("Aborting")
             exit()
 
-    print("Loading data...")
-    data, coords = read_data.read_data(amount=args.amount or -1)
-    amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
-    data_train, data_test = data[:amount], data[amount:]
-    coords_train, coords_test = coords[:amount], coords[amount:]
+    print("Loading train data...")
+    data_train, coords_train = read_data.read_data(os.path.join("data", "train"), amount=args.amount or -1)
+    print("Loading test data...")
+    data_test,  coords_test  = read_data.read_data(os.path.join("data", "test"))
 
     print("Train images:", " x ".join(map(str, data_train.shape)))
     print(" Test images:", " x ".join(map(str, data_test.shape)))

@@ -10,7 +10,7 @@ from ai import *
 import read_data
 import torch
 
-USE_TEST = True
+USE_TEST = False
 TEST_BEST = False
 proj = plt.imread("mercator.png")
 
@@ -31,11 +31,7 @@ else:
     exit()
 
 
-data, coords = read_data.read_data(amount=amount)
-amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
-
-data_test   = data[amount:] if USE_TEST else data[:amount]
-coords_test = coords[amount:] if USE_TEST else coords[:amount]
+data_test, coords_test = read_data.read_data(os.path.join("data", "test" if USE_TEST else "train"), amount=100)
 
 print("Test images:", data_test.shape)
 
