@@ -137,17 +137,19 @@ if __name__ == "__main__":
         print("Generation {:4d}".format(EPOCH), end="", flush=True)
 
         batch_losses_train = []
-        batch_losses_test = []
 
-        for batch in [data_train[i:i+BATCH_SIZE] for i in range(0, len(data_train), BATCH_SIZE)]:
+        for batch_idx in range(0, len(data_train), BATCH_SIZE):
+            data_batch     = data_train[batch_idx:batch_idx + BATCH_SIZE]
+            coords_batch = coords_train[batch_idx:batch_idx + BATCH_SIZE]
+
             print(".", end="", flush=True)
             ai.zero_grad()
 
             # print("Training...")
-            res = ai(Variable(torch.Tensor(data_train)))
+            res = ai(Variable(torch.Tensor(data_batch)))
             # print(ERASE_LAST + "Generated...")
 
-            loss = crit(res, Variable(torch.Tensor(coords_train)))
+            loss = crit(res, Variable(torch.Tensor(coords_batch)))
             # print("Loss:", loss.data[0])
             loss.backward()
             # print(ERASE_LAST + "Backwarded")
@@ -155,16 +157,15 @@ if __name__ == "__main__":
             opt.step()
             # print(ERASE_LAST + "Stepped")
 
-            test_res = ai(Variable(torch.Tensor(data_test)))
-            test_loss = crit(test_res, Variable(torch.Tensor(coords_test)))
-
             batch_losses_train.append(loss.data[0])
-            batch_losses_test.append(test_loss.data[0])
+
+        test_res = ai(Variable(torch.Tensor(data_test)))
+        loss_test = crit(test_res, Variable(torch.Tensor(coords_test))).data[0]
+
 
         print()
 
         loss_train = sum(batch_losses_train) / len(batch_losses_train)
-        loss_test = sum(batch_losses_test) / len(batch_losses_test)
 
         train_loss_history.append(loss_train)
         test_loss_history.append(loss_test)
