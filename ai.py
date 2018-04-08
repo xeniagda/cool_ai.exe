@@ -179,10 +179,10 @@ if __name__ == "__main__":
         is_best = loss_train == min(train_loss_history)
         if is_best:
             print(ERASE_LAST +
-                "Generation {:4d}: Test: {:.7f}, Train: {:.7f} (best)".format(EPOCH, loss_test, loss_test))
+                "Generation {:4d}: Test: {:.7f}, Train: {:.7f} (best)".format(EPOCH, loss_test, loss_train))
         else:
             print(ERASE_LAST +
-                "Generation {:4d}: Test: {:.4f},    Train: {:.4f}".format(EPOCH, loss_test, loss_test))
+                "Generation {:4d}: Test: {:.4f},    Train: {:.4f}".format(EPOCH, loss_test, loss_train))
 
         try:
             torch.save(
