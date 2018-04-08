@@ -8,7 +8,7 @@ from scipy.misc import imresize
 
 WANTED_SIZE = 32, 32
 
-def read_data(path="compressed", amount=-1, verbose_level=1):
+def read_data(path=os.path.join("data", "train"), amount=-1, verbose_level=1):
     images = []
     coords = []
 
