@@ -109,7 +109,7 @@ def save():
             "epoch": EPOCH,
             "train_loss_history": train_loss_history,
             "test_loss_history": test_loss_history,
-            "amount": len(data)
+            "amount": args.amount or -1
             }
 
     torch.save(save_dict, SAVE_PATH)
