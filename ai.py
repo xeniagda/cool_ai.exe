@@ -3,7 +3,11 @@ import sys
 
 import argparse
 # Parse arguments
-parser = argparse.ArgumentParser(description="Train the cool_ai.exe")
+parser = argparse.ArgumentParser(
+        description="Train the cool_ai.exe",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+
 parser.add_argument(
         "--load-path", "-l",
         type=str, default="ai.tar",
