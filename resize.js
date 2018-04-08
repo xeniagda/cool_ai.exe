@@ -11,11 +11,11 @@ var file_idx = 0;
 function process_file(file) {
     if (file.endsWith(".png")) {
 
-        while (fs.existsSync("compressed/" + file_idx))
+        while (fs.existsSync("data/tmp/" + file_idx))
             file_idx += 1;
 
-        let file1 = 'data/' + file;
-        let file2 = 'compressed/' + file_idx + ".png";
+        let file1 = 'data/load/' + file;
+        let file2 = 'data/tmp/' + file_idx + ".png";
 
         console.log(file1, "->", file2);
 
@@ -40,8 +40,8 @@ function process_file(file) {
         });
 
         // Copy coords
-        var coords1 = 'data/' + file.replace(/\.png/, "");
-        var coords2 = 'compressed/' + file_idx;
+        var coords1 = 'data/load/' + file.replace(/\.png/, "");
+        var coords2 = 'data/tmp/' + file_idx;
 
         console.log(coords1, "->", coords2);
         fs.createReadStream(coords1).pipe(fs.createWriteStream(coords2));
@@ -50,7 +50,7 @@ function process_file(file) {
     return false;
 }
 
-fs.readdir("data", (err, files) => {
+fs.readdir("data/load", (err, files) => {
     if (err) console.log("Error:", err);
 
     if (amount == 0) {

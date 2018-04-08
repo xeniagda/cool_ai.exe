@@ -3,7 +3,7 @@ var system = require("system")
 
 var amount = 0;
 var maxAmount = system.args[1] | 0;
-var index = Math.floor(fs.list("data").length/2)-1;
+var index = Math.floor(fs.list("data/load").length/2)-1;
 
 //console.log(JSON.stringify(fs.list("data")));
 
@@ -58,12 +58,12 @@ function getTest(){
 		    		document.getElementsByClassName("button button--full-width modal__action-button")[0].click()
 			    });
 		        setTimeout(function(){  
-		            page.render("data/"+index + ".png");
+		            page.render("data/load/"+index + ".png");
 		            var data = JSON.stringify({
 						lat:lat/90,
 						lng:lng/180
 					});
-					fs.write('data/'+index, data,"w");
+					fs.write('data/load/'+index, data,"w");
 					callback();
 		        },12000)
 		    });    
