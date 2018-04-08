@@ -31,7 +31,7 @@ else:
     exit()
 
 
-data_test, coords_test = read_data.read_data(os.path.join("data", "test" if USE_TEST else "train"), amount=100)
+data_test, coords_test = read_data.read_data(not USE_TEST, amount=100)
 
 print("Test images:", data_test.shape)
 

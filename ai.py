@@ -120,9 +120,9 @@ if __name__ == "__main__":
             exit()
 
     print("Loading train data...")
-    data_train, coords_train = read_data.read_data(os.path.join("data", "train"), amount=args.amount or -1)
+    data_train, coords_train = read_data.read_data(train=True, amount=args.amount or -1)
     print("Loading test data...")
-    data_test,  coords_test  = read_data.read_data(os.path.join("data", "test"))
+    data_test,  coords_test  = read_data.read_data(train=False)
 
     print("Train images:", " x ".join(map(str, data_train.shape)))
     print(" Test images:", " x ".join(map(str, data_test.shape)))

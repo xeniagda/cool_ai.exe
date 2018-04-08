@@ -1,6 +1,7 @@
 import math
 import json
 import os
+import random
 
 import PIL.Image as im
 import numpy as np
@@ -8,7 +9,12 @@ from scipy.misc import imresize
 
 WANTED_SIZE = 32, 32
 
-def read_data(path=os.path.join("data", "train"), amount=-1, verbose_level=1):
+def read_data(train, path="data", amount=-1, verbose_level=1):
+    if train:
+        path = os.path.join(path, "train")
+    else:
+        path = os.path.join(path, "test")
+
     images = []
     coords = []
 
@@ -23,7 +29,10 @@ def read_data(path=os.path.join("data", "train"), amount=-1, verbose_level=1):
         format_str = "\033[1A" + format_str
     i = 0
 
-
+    if train:
+        pngs = sorted(pngs)
+    else:
+        random.shuffle(pngs)
 
     for f in sorted(pngs):
         if i == amount:
