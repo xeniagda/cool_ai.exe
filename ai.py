@@ -102,6 +102,20 @@ class cool_ai_exe(nn.Module):
 
         return x
 
+def save():
+    save_dict = {
+            "ai": ai,
+            "opt": opt,
+            "epoch": EPOCH,
+            "train_loss_history": train_loss_history,
+            "test_loss_history": test_loss_history,
+            "amount": len(data)
+            }
+
+    torch.save(save_dict, SAVE_PATH)
+
+    if is_best:
+        torch.save(save_dict, BEST_PATH)
 
 if __name__ == "__main__":
     if args.new and os.path.isfile(LOAD_PATH):
@@ -189,22 +203,8 @@ if __name__ == "__main__":
                 "Generation {:4d}: Test: {:.4f},    Train: {:.4f}".format(EPOCH, loss_test, loss_train))
 
         try:
-            torch.save(
-                    {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
-                    , "test_loss_history": test_loss_history}, SAVE_PATH)
-
-            if is_best:
-                torch.save(
-                        {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
-                        , "test_loss_history": test_loss_history}, BEST_PATH)
+            save()
         except KeyboardInterrupt as e:
-            torch.save(
-                    {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
-                    , "test_loss_history": test_loss_history}, SAVE_PATH)
-
-            if is_best:
-                torch.save(
-                        {"ai": ai, "opt": opt, "epoch": EPOCH, "train_loss_history": train_loss_history
-                        , "test_loss_history": test_loss_history}, BEST_PATH)
+            save()
             raise e
 
