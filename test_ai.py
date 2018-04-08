@@ -12,23 +12,11 @@ import torch
 
 USE_TEST = True
 TEST_BEST = False
-
 proj = plt.imread("mercator.png")
-
-path_to_use = BEST_PATH if TEST_BEST else SAVE_PATH
-
-data, coords = read_data.read_data(amount=5000)
-amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
-
-data_test   = data[amount:] if USE_TEST else data[:amount]
-coords_test = coords[amount:] if USE_TEST else coords[:amount]
-
-print("Test images:", data_test.shape)
-
-ai = cool_ai_exe()
 
 EPOCH = 0
 
+path_to_use = BEST_PATH if TEST_BEST else SAVE_PATH
 if os.path.isfile(path_to_use):
     print("Loading state from", path_to_use)
     state = torch.load(path_to_use)
@@ -37,9 +25,19 @@ if os.path.isfile(path_to_use):
     EPOCH = state["epoch"]
     train_loss_history = state["train_loss_history"]
     test_loss_history  = state["test_loss_history"]
+    amount = state["amount"]
 else:
     print("No ai save")
     exit()
+
+
+data, coords = read_data.read_data(amount=amount)
+amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
+
+data_test   = data[amount:] if USE_TEST else data[:amount]
+coords_test = coords[amount:] if USE_TEST else coords[:amount]
+
+print("Test images:", data_test.shape)
 
 print("Epoch", EPOCH)
 
