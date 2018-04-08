@@ -100,6 +100,12 @@ class cool_ai_exe(nn.Module):
 
 
 if __name__ == "__main__":
+    if args.new and os.path.isfile(LOAD_PATH):
+        print("This will override the already trained {}!")
+        if input("Continue? [y/N] ").lower() != "y":
+            print("Aborting")
+            exit()
+
     print("Loading data...")
     data, coords = read_data.read_data(amount=args.amount or -1)
     amount = int(data.shape[0] * TRAIN_TEST_SPLIT)
