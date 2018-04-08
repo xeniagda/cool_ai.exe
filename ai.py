@@ -25,6 +25,10 @@ parser.add_argument(
         type=float, default=0.8,
         help="The train/test split")
 parser.add_argument(
+        "--batch-size", "-bs",
+        type=int, default=5000,
+        help="Divide the dataset into batches for less memory usage and (potentially) faster processing")
+parser.add_argument(
         "--learning-rate", "-lr",
         type=float, default=0.2,
         help="The learning rate the cool_ai.exe should use")
@@ -63,6 +67,7 @@ SAVE_PATH = args.save_path
 LOAD_PATH = args.load_path
 BEST_PATH = args.best_path
 
+BATCH_SIZE = args.batch_size
 TRAIN_TEST_SPLIT = args.split
 LEARNING_RATE = args.learning_rate
 MOMENTUM = args.momentum
@@ -129,34 +134,48 @@ if __name__ == "__main__":
     while True:
         EPOCH += 1
 
-        print("Generation {:4d}...".format(EPOCH))
-        ai.zero_grad()
+        print("Generation {:4d}".format(EPOCH), end="", flush=True)
 
-        # print("Training...")
-        res = ai(Variable(torch.Tensor(data_train)))
-        # print(ERASE_LAST + "Generated...")
+        batch_losses_train = []
+        batch_losses_test = []
 
-        loss = crit(res, Variable(torch.Tensor(coords_train)))
-        # print("Loss:", loss.data[0])
-        loss.backward()
-        # print(ERASE_LAST + "Backwarded")
+        for batch in [data_train[i:i+BATCH_SIZE] for i in range(0, len(data_train), BATCH_SIZE)]:
+            print(".", end="", flush=True)
+            ai.zero_grad()
 
-        opt.step()
-        # print(ERASE_LAST + "Stepped")
+            # print("Training...")
+            res = ai(Variable(torch.Tensor(data_train)))
+            # print(ERASE_LAST + "Generated...")
 
-        test_res = ai(Variable(torch.Tensor(data_test)))
-        test_loss = crit(test_res, Variable(torch.Tensor(coords_test)))
+            loss = crit(res, Variable(torch.Tensor(coords_train)))
+            # print("Loss:", loss.data[0])
+            loss.backward()
+            # print(ERASE_LAST + "Backwarded")
 
-        train_loss_history.append(loss.data[0])
-        test_loss_history.append(test_loss.data[0])
+            opt.step()
+            # print(ERASE_LAST + "Stepped")
 
-        is_best = loss.data[0] == min(train_loss_history)
+            test_res = ai(Variable(torch.Tensor(data_test)))
+            test_loss = crit(test_res, Variable(torch.Tensor(coords_test)))
+
+            batch_losses_train.append(loss.data[0])
+            batch_losses_test.append(test_loss.data[0])
+
+        print()
+
+        loss_train = sum(batch_losses_train) / len(batch_losses_train)
+        loss_test = sum(batch_losses_test) / len(batch_losses_test)
+
+        train_loss_history.append(loss_train)
+        test_loss_history.append(loss_test)
+
+        is_best = loss_train == min(train_loss_history)
         if is_best:
             print(ERASE_LAST +
-                "Generation {:4d}: Test: {:.7f}, Train: {:.7f} (best)".format(EPOCH, test_loss.data[0], loss.data[0]))
+                "Generation {:4d}: Test: {:.7f}, Train: {:.7f} (best)".format(EPOCH, loss_test, loss_test))
         else:
             print(ERASE_LAST +
-                "Generation {:4d}: Test: {:.4f},    Train: {:.4f}".format(EPOCH, test_loss.data[0], loss.data[0]))
+                "Generation {:4d}: Test: {:.4f},    Train: {:.4f}".format(EPOCH, loss_test, loss_test))
 
         try:
             torch.save(
