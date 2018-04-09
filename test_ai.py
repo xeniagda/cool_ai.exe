@@ -25,7 +25,7 @@ if os.path.isfile(path_to_use):
     EPOCH = state["epoch"]
     train_loss_history = state["train_loss_history"]
     test_loss_history  = state["test_loss_history"]
-    amount = state["amount"]
+    # amount = state["amount"]
 else:
     print("No ai save")
     exit()
