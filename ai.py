@@ -41,7 +41,10 @@ parser.add_argument(
         action="store_true",
         help="Create a new cool_ai.exe")
 
-args = parser.parse_args()
+if __name__ == "__main__":
+    args = parser.parse_args()
+else:
+    args = parser.parse_args([])
 
 import torch
 import torch.nn as nn
