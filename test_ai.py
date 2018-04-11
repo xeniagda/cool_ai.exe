@@ -30,6 +30,10 @@ else:
     print("No ai save")
     exit()
 
+if len(sys.argv) == 2:
+    nr_to_show = int(sys.argv[1])
+else:
+    nr_to_show = 10
 
 data_test, coords_test = read_data.read_data(not USE_TEST, amount=100)
 
@@ -51,7 +55,7 @@ def long_lat2xy(long, lat):
     return x, y
 
 while True:
-    for i in range(10):
+    for i in range(nr_to_show):
         idx = random.randrange(len(data_test))
 
         im = data_test[idx]
