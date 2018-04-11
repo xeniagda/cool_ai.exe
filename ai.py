@@ -114,7 +114,7 @@ def save():
 
 if __name__ == "__main__":
     if args.new and os.path.isfile(LOAD_PATH):
-        print("This will override the already trained {}!")
+        print("This will override the already trained {}!".format(LOAD_PATH))
         if input("Continue? [y/N] ").lower() != "y":
             print("Aborting")
             exit()
